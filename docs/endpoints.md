@@ -27,7 +27,7 @@ There are 2 endpoints available:
 | language        | `en` (default is auto recognition)             | Source language code (see supported languages)                 |
 | word_timestamps | false (default)                                | Enable word-level timestamps (Faster Whisper only)             |
 | vad_filter      | false (default)                                | Enable voice activity detection filtering (Faster Whisper only) |
-| encode          | true (default)                                 | Encode audio through FFmpeg before processing                  |
+| encode          | true (default)                                 | Encode audio through FFmpeg before processing. Disabling only works if the uploaded audio is mono 16-kHz PCM; otherwise use `FORCE_ENCODE=true` or omit `encode=false`. |
 | diarize         | false (default)                                | Enable speaker diarization (WhisperX only)                     |
 | min_speakers    | null (default)                                 | Minimum number of speakers for diarization (WhisperX only)     |
 | max_speakers    | null (default)                                 | Maximum number of speakers for diarization (WhisperX only)     |

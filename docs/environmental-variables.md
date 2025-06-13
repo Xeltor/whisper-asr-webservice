@@ -96,3 +96,11 @@ export HF_TOKEN=your_token_here
 ```
 
 Required when using the WhisperX engine to download the diarization model.
+
+### Forcing Audio Encoding
+
+```shell
+export FORCE_ENCODE=true
+```
+
+Defaults to `false`. When enabled, the service will encode uploaded audio with FFmpeg regardless of the `encode` request parameter.
