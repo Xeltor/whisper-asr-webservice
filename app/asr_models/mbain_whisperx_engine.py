@@ -14,25 +14,20 @@ from app.config import CONFIG
 class WhisperXASR(ASRModel):
     def __init__(self):
         super().__init__()
-        self.model = {
-            'whisperx': None,
-            'diarize_model': None,
-            'align_model': {}
-        }
+        self.model = {'whisperx': None, 'diarize_model': None, 'align_model': {}}
 
     def load_model(self):
+        if self.model is None:
+            self.model = {'whisperx': None, 'diarize_model': None, 'align_model': {}}
+
         asr_options = {"without_timestamps": False}
         self.model['whisperx'] = whisperx.load_model(
-            CONFIG.MODEL_NAME,
-            device=CONFIG.DEVICE,
-            compute_type=CONFIG.MODEL_QUANTIZATION,
-            asr_options=asr_options
+            CONFIG.MODEL_NAME, device=CONFIG.DEVICE, compute_type=CONFIG.MODEL_QUANTIZATION, asr_options=asr_options
         )
 
         if CONFIG.HF_TOKEN != "":
             self.model['diarize_model'] = whisperx.DiarizationPipeline(
-                use_auth_token=CONFIG.HF_TOKEN,
-                device=CONFIG.DEVICE
+                use_auth_token=CONFIG.HF_TOKEN, device=CONFIG.DEVICE
             )
 
         Thread(target=self.monitor_idleness, daemon=True).start()
@@ -96,13 +91,13 @@ class WhisperXASR(ASRModel):
         audio = whisper.pad_or_trim(audio)
 
         # make log-Mel spectrogram and move to the same device as the model
-        mel = whisper.log_mel_spectrogram(audio).to(self.model.device)
+        mel = whisper.log_mel_spectrogram(audio).to(self.model['whisperx'].device)
 
         # detect the spoken language
         with self.model_lock:
             if self.model is None:
                 self.load_model()
-            _, probs = self.model.detect_language(mel)
+            _, probs = self.model['whisperx'].detect_language(mel)
         detected_lang_code = max(probs, key=probs.get)
 
         return detected_lang_code
@@ -111,7 +106,7 @@ class WhisperXASR(ASRModel):
         default_options = {
             "max_line_width": CONFIG.SUBTITLE_MAX_LINE_WIDTH,
             "max_line_count": CONFIG.SUBTITLE_MAX_LINE_COUNT,
-            "highlight_words": CONFIG.SUBTITLE_HIGHLIGHT_WORDS
+            "highlight_words": CONFIG.SUBTITLE_HIGHLIGHT_WORDS,
         }
 
         if output == "srt":
