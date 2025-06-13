@@ -99,8 +99,9 @@ class WhisperXASR(ASRModel):
                 self.load_model()
             _, probs = self.model['whisperx'].detect_language(mel)
         detected_lang_code = max(probs, key=probs.get)
+        detected_lang_confidence = probs[detected_lang_code]
 
-        return detected_lang_code
+        return detected_lang_code, detected_lang_confidence
 
     def write_result(self, result: dict, file: BinaryIO, output: Union[str, None]):
         default_options = {
